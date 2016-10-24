@@ -1,0 +1,4 @@
+.vagrant
+*.tfstate*
+.terraform
+.aws
