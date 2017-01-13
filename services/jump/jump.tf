@@ -21,22 +21,23 @@ variable "appzone_name" {
   default = "mtzo"
 }
 
-variable "subnet" {
-  default = "dmz"
+variable "az" {
+  default = "0"
+}
+
+variable "zone_sg_id" {
+
+}
+
+variable "subnet_list" {
+  type = "list"
 }
 
 data "terraform_remote_state" "vpc" {
-    backend = "local"
-    config {
-        path = "${path.module}/../../vdcs/${var.vpc_name}/terraform.tfstate"
-    }
-}
-
-data "terraform_remote_state" "zone" {
-    backend = "local"
-    config {
-        path = "${path.module}/../../zones/${var.appzone_name}/terraform.tfstate"
-    }
+  backend = "local"
+  config {
+    path = "${path.module}/../../vdcs/${var.vpc_name}/terraform.tfstate"
+  }
 }
 
 provider "aws" {
@@ -52,7 +53,7 @@ data "template_file" "init" {
   }
 }
 
-module "jump_instance" {
+module "instance" {
   source        = "../../modules/instance"
 
   vpc_id        = "${data.terraform_remote_state.vpc.vpc_id}"
@@ -60,8 +61,9 @@ module "jump_instance" {
   domain        = "${data.terraform_remote_state.vpc.domain}"
   zone_id       = "${data.terraform_remote_state.vpc.zone_id}"
 
-  subnet_id     = "${data.terraform_remote_state.zone.subnet_dmz_az_a_id}"
-  sg_list       = "${data.terraform_remote_state.zone.sg_list}"
+  subnet_list   = "${var.subnet_list}"
+  az_index      = "${var.az}"
+  sg_list       = [ "${data.terraform_remote_state.vpc.vpc_sg_id}", "${var.zone_sg_id}" ]
 
   service       = "${var.service}"
   hostname      = "${var.hostname}"
@@ -70,49 +72,45 @@ module "jump_instance" {
 }
 
 # --------------------------------
-# Associate the Jump Box EIP defined at the VPC level
+# Create public DNS record
 # --------------------------------
-resource "aws_eip_association" "eip_assoc" {
-  instance_id = "${module.jump_instance.instance_id}"
-  allocation_id = "${data.terraform_remote_state.zone.jump_eip_id}"
+module "service_public_dns" {
+  source = "../../modules/route53/record"
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  zone_id = "${data.terraform_remote_state.vpc.public_zone_id}"
+  ip = "${module.instance.public_ip}"
+  name = "${var.hostname}.${var.vpc_name}.${data.terraform_remote_state.vpc.public_domain}"
 }
 
 module "ssh_ingress" {
   source = "../../modules/sg/rule_cidr"
 
-  sg_id = "${module.jump_instance.sg_id}"
-  protocol = "TCP"
-  from_port = "22"
-  to_port = "22"
-}
-
-
-module "ssh_ingress_from_jump" {
-  source = "../../modules/sg/rule_sg"
-
-  sg_id = "${data.terraform_remote_state.zone.zone_sg_id}"
-  source_sg_id = "${module.jump_instance.sg_id}"
+  sg_id = "${module.instance.sg_id}"
   protocol = "TCP"
   from_port = "22"
   to_port = "22"
 }
 
 output "public_ip" {
-  value = "${data.terraform_remote_state.zone.jump_ip}"
+  value = "${module.instance.public_ip}"
+}
+
+output "public_fqdn" {
+  value = "${var.hostname}.${var.vpc_name}.${data.terraform_remote_state.vpc.root_domain}"
+}
+
+output "fqdn" {
+  value = "${module.instance.fqdn}"
 }
 
 output "private_ip" {
-  value = "${module.jump_instance.private_ip}"
+  value = "${module.instance.private_ip}"
 }
 
 output "instance_id" {
-   value = "${module.jump_instance.instance_id}"
+   value = "${module.instance.instance_id}"
 }
 
 output "sg_id" {
-  value = "${module.jump_instance.sg_id}"
+  value = "${module.instance.sg_id}"
 }

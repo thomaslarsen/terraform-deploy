@@ -3,10 +3,12 @@ variable "ami_id" {
 }
 
 variable "instance_type" {
-  default = "t2.micro"
 }
 
 variable "service" {
+}
+
+variable "role" {
 }
 
 variable "hostname" {
@@ -20,15 +22,25 @@ variable "userdata" {
 }
 variable "vpc_id" {
 }
-variable "subnet_id" {
+
+variable "subnet_list" {
+  type = "list"
 }
+
+variable "az_index" {
+  default = 0
+}
+
 variable "key_name" {
 }
+
 variable "sg_list" {
   type = "list"
 }
+
 variable "domain" {
 }
+
 variable "zone_id" {
 }
 
@@ -39,14 +51,14 @@ module "service_sg" {
   source = "../sg"
 
   vpc_id = "${var.vpc_id}"
-  name = "sg-${var.service}"
+  name = "${var.service}"
 }
 
 resource "aws_instance" "instance" {
-  ami = "${var.ami_id}"
-  instance_type = "${var.instance_type}"
-  subnet_id = "${var.subnet_id}"
-  key_name = "${var.key_name}"
+  ami             = "${var.ami_id}"
+  instance_type   = "${var.instance_type}"
+  subnet_id       = "${element(var.subnet_list, var.az_index)}"
+  key_name        = "${var.key_name}"
   vpc_security_group_ids = [
     "${concat(
       list(
@@ -56,10 +68,11 @@ resource "aws_instance" "instance" {
     )}"]
 
   tags = {
-    Name = "${var.service}-${var.appzone_name}"
-    Hostname = "${var.hostname}"
-    FQDN = "${var.hostname}.${var.appzone_name}.${var.domain}"
-    Service = "${var.service}"
+    Name        = "${var.service}-${var.appzone_name}"
+    Hostname    = "${var.hostname}"
+    FQDN        = "${var.hostname}.${var.appzone_name}.${var.domain}"
+    Service     = "${var.service}"
+    role        = "${var.role}"
   }
 
   user_data = "${var.userdata}"
@@ -82,6 +95,10 @@ module "service_dns" {
 
 output "private_ip" {
   value = "${aws_instance.instance.private_ip}"
+}
+
+output "public_ip" {
+  value = "${aws_instance.instance.public_ip}"
 }
 
 output "instance_id" {

@@ -20,10 +20,6 @@ output "default_route_table_id" {
   value = "${aws_route_table.default.id}"
 }
 
-output "default_nacl_id" {
-  value = "${aws_default_network_acl.default.id}"
-}
-
 output "zone_id" {
   value = "${module.vpc_dns_zone.zone_id}"
 }

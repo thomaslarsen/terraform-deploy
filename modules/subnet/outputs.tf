@@ -1,15 +1,7 @@
-output "id_az_a" {
-  value = "${aws_subnet.subnet-az-a.id}"
+output "id" {
+  value = ["${aws_subnet.subnet.*.id}"]
 }
 
-output "id_az_b" {
-  value = "${aws_subnet.subnet-az-b.id}"
-}
-
-output "cidr_az_a" {
-  value = "${aws_subnet.subnet-az-a.cidr_block}"
-}
-
-output "cidr_az_b" {
-  value = "${aws_subnet.subnet-az-b.cidr_block}"
+output "cidr" {
+  value = ["${aws_subnet.subnet.*.cidr_block}"]
 }

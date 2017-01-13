@@ -1,10 +1,3 @@
-output "jump_eip_id" {
-  value = "${module.jump_eip.eip_id}"
-}
-
-output "jump_ip" {
-  value = "${module.jump_eip.public_ip}"
-}
 
 output "appzone_name" {
   value = "${var.appzone_name}"
@@ -21,86 +14,58 @@ output "sg_list" {
   ]
 }
 
-output "subnet_dmz_az_a_id" {
-  value = "${module.dmz_subnet.id_az_a}"
+output "internal_route_table_id" {
+  value = "${aws_route_table.internal.id}"
 }
 
-output "subnet_dmz_az_b_id" {
-  value = "${module.dmz_subnet.id_az_b}"
+output "boundary_route_table_id" {
+  value = "${aws_route_table.boundary.id}"
 }
 
-output "subnet_dmz_cidr_az_a" {
-  value = "${module.dmz_subnet.cidr_az_a}"
+output "nat_gateway_id" {
+  value = "${aws_nat_gateway.gw.id}"
 }
 
-output "subnet_dmz_cidr_az_b" {
-  value = "${module.dmz_subnet.cidr_az_b}"
+output "subnet_dmz_id" {
+  value = "${module.dmz_subnet.id}"
 }
 
-
-output "subnet_boundary_az_a_id" {
-  value = "${module.boundary_subnet.id_az_a}"
-}
-
-output "subnet_boundary_az_b_id" {
-  value = "${module.public_subnet.id_az_b}"
-}
-
-output "subnet_boundary_cidr_az_a" {
-  value = "${module.boundary_subnet.cidr_az_a}"
-}
-
-output "subnet_boundary_cidr_az_b" {
-  value = "${module.boundary_subnet.cidr_az_b}"
+output "subnet_dmz_cidr" {
+  value = "${module.dmz_subnet.cidr}"
 }
 
 
-output "subnet_public_az_a_id" {
-  value = "${module.public_subnet.id_az_a}"
+output "subnet_boundary_id" {
+  value = "${module.boundary_subnet.id}"
 }
 
-output "subnet_public_az_b_id" {
-  value = "${module.public_subnet.id_az_b}"
-}
-
-output "subnet_public_cidr_az_a" {
-  value = "${module.public_subnet.cidr_az_a}"
-}
-
-output "subnet_public_cidr_az_b" {
-  value = "${module.public_subnet.cidr_az_b}"
+output "subnet_boundary_cidr" {
+  value = "${module.boundary_subnet.cidr}"
 }
 
 
-output "subnet_data_az_a_id" {
-  value = "${module.data_subnet.id_az_a}"
+output "subnet_public_id" {
+  value = "${module.public_subnet.id}"
 }
 
-output "subnet_data_az_b_id" {
-  value = "${module.data_subnet.id_az_b}"
-}
-
-output "subnet_data_cidr_az_a" {
-  value = "${module.data_subnet.cidr_az_b}"
-}
-
-output "subnet_data_cidr_az_b" {
-  value = "${module.data_subnet.cidr_az_b}"
+output "subnet_public_cidr" {
+  value = "${module.public_subnet.cidr}"
 }
 
 
-output "subnet_private_az_a_id" {
-  value = "${module.private_subnet.id_az_a}"
+output "subnet_data_id" {
+  value = "${module.data_subnet.id}"
 }
 
-output "subnet_private_az_b_id" {
-  value = "${module.private_subnet.id_az_b}"
+output "subnet_data_cidr" {
+  value = "${module.data_subnet.cidr}"
 }
 
-output "subnet_private_cidr_az_a" {
-  value = "${module.private_subnet.cidr_az_a}"
+
+output "subnet_private_id" {
+  value = "${module.private_subnet.id}"
 }
 
-output "subnet_private_cidr_az_b" {
-  value = "${module.private_subnet.cidr_az_b}"
+output "subnet_private_cidr" {
+  value = "${module.private_subnet.cidr}"
 }

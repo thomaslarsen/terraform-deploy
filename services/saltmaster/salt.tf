@@ -7,18 +7,18 @@ variable "instance_type" {
 }
 
 variable "service" {
-  default = "blank"
+  default = "saltmaster"
 }
 
 variable "hostname" {
-  default = "blank"
+  default = "salt"
 }
-
 
 variable "vpc_name" {
 }
 
 variable "appzone_name" {
+  default = "mtzo"
 }
 
 variable "subnet_list" {
@@ -33,11 +33,19 @@ variable "zone_sg_id" {
 
 }
 
+variable "kickstart_url" {
+
+}
+
+variable "kickstart_branch" {
+  default = "master"
+}
+
 data "terraform_remote_state" "vpc" {
-    backend = "local"
-    config {
-        path = "${path.module}/../../vdcs/${var.vpc_name}/terraform.tfstate"
-    }
+  backend = "local"
+  config {
+    path = "${path.module}/../../vdcs/${var.vpc_name}/terraform.tfstate"
+  }
 }
 
 provider "aws" {
@@ -45,11 +53,15 @@ provider "aws" {
 }
 
 data "template_file" "init" {
-  template = "${file("${path.module}/../../templates/init.cl")}"
+  template = "${file("${path.module}/../../templates/${var.service}.cl")}"
 
   vars = {
     hostname = "${var.hostname}"
     fqdn = "${var.hostname}.${var.appzone_name}.${data.terraform_remote_state.vpc.domain}"
+    kickstart_url = "${var.kickstart_url}"
+    git_key = "${file("${path.module}/../../vdcs/${var.vpc_name}/secrets/${var.vpc_name}_rsa")}"
+    branch = "${var.kickstart_branch}"
+    autosign = "*.${data.terraform_remote_state.vpc.domain}"
   }
 }
 
@@ -69,6 +81,21 @@ module "instance" {
   hostname      = "${var.hostname}"
   appzone_name  = "${var.appzone_name}"
   userdata      = "${data.template_file.init.rendered}"
+}
+
+# Add ingress rules from all hosts in the VPC
+module "saltmaster_ingress" {
+  source = "../../modules/sg/rule_sg"
+
+  sg_id = "${module.instance.sg_id}"
+  protocol = "TCP"
+  from_port = "4505"
+  to_port = "4506"
+  source_sg_id = "${data.terraform_remote_state.vpc.vpc_sg_id}"
+}
+
+output "fqdn" {
+  value = "${module.instance.fqdn}"
 }
 
 output "private_ip" {

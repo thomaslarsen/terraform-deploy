@@ -10,6 +10,10 @@ resource "aws_vpc" "vpc" {
 
 resource "aws_internet_gateway" "ig" {
   vpc_id = "${aws_vpc.vpc.id}"
+
+  tags {
+    Name = "ig-${var.name}"
+  }
 }
 
 resource "aws_route_table" "default" {
@@ -19,34 +23,8 @@ resource "aws_route_table" "default" {
     gateway_id = "${aws_internet_gateway.ig.id}"
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_default_network_acl" "default" {
-  default_network_acl_id = "${aws_vpc.vpc.default_network_acl_id}"
-
-  ingress {
-    protocol   = -1
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-
-  egress {
-    protocol   = -1
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-
-  tags = {
-    Name = "nacl-${var.name}-default"
+  tags {
+    Name = "rt-${var.name}-default"
   }
 
   lifecycle {
@@ -58,8 +36,8 @@ module "vpc_sg" {
   source = "../sg"
 
   vpc_id = "${aws_vpc.vpc.id}"
-  name = "sg-${var.name}"
-#  description = "Security Group for VPC ${var.name}"
+  name = "${var.name}"
+  description = "Security Group for VPC ${var.name}"
 }
 
 module "sg_egress_all" {

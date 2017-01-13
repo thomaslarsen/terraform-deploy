@@ -1,0 +1,31 @@
+{
+  "appzone_name": "mtzo",
+  "appzone_index": "0",
+
+  "thin_ami_id": "ami-8b8c57f8",
+
+  "jump_instance_type":         "t2.micro",
+  "saltmaster_instance_type":   "t2.micro",
+  "ldap_instance_type":         "t2.micro",
+  "consul_instance_type":       "t2.micro",
+
+  "jump_hostname": "jump",
+  "jump_service": "jump",
+  "jump_ssh_port": 22,
+
+  "saltmaster_hostname": "salt",
+  "saltmaster_service": "saltmaster",
+  "saltmaster_port1": 4505,
+  "saltmaster_port2": 4506,
+  "saltmaster_kickstart_url": "git@github.com:thomaslarsen/salt-cloud.git",
+  "saltmaster_kickstart_branch": "aws",
+
+  "ldap_hostname": "ldap",
+  "ldap_service": "ldap",
+  "ldap_port": 389,
+
+  "consul_hostname": "consul",
+  "consul_service": "consul-server",
+  "consul_port": 8500,
+
+}

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+export AWS_SHARED_CREDENTIALS_FILE=$(git rev-parse --show-toplevel)/.aws/credentials
+
+export TF_VAR_VDC_INDEX=0
+export TF_VAR_APPZONE_INDEX=0
+
+PHASE=$(git rev-parse --show-prefix | cut -d'/' -f1)
+OBJECT=$(git rev-parse --show-prefix | cut -d'/' -f2)
+
+VAR_FILE=$(git rev-parse --show-toplevel)/config/$PHASE.$OBJECT.json
+
+#echo $VAR_FILE
+
+terraform $@ -var-file $VAR_FILE

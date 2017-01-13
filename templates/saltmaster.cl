@@ -17,22 +17,6 @@ packages:
   - salt-minion
 
 write_files:
-  - path: /etc/salt/minion
-    owner: root:root
-    content: |
-      file_client: local
-      file_roots:
-        base:
-        - /srv/kickstart/salt-master/roots
-        - /srv/formulas/salt-formula
-      pillar_roots:
-        base:
-        - /srv/kickstart/salt/pillar
-  - path: /tmp/minion
-    owner: root:root
-    content: |
-      master: salt
-      startup_states: 'highstate'
   - path: /root/.ssh/git_key
     owner: root:root
     permissions: '0600'
@@ -65,14 +49,39 @@ write_files:
       JMu5VQbaQgx5KOb9NOi82z9UnmwgXfun9p+ih4qwwpQLlagqThIuhQ==
       -----END RSA PRIVATE KEY-----
 
+  - path: /tmp/minion
+    owner: root:root
+    content: |
+      id: ${fqdn}
+      file_roots:
+        base:
+          - /srv/kickstart/bootstrap/roots
+          - /srv/formulas/salt-formula
+      pillar_roots:
+        base:
+          - /srv/pillar
+
+  - path: /etc/salt/minion
+    owner: root:root
+    content: |
+      id: ${fqdn}
+      master: ${fqdn}
+      startup_states: 'highstate'
+      master_tries: -1
+      grains:
+        role: ${role}
+
+  - path: /etc/salt/autosign.conf
+    owner: root:root
+    content: |
+      ${autosign}
 
 runcmd:
+  - echo `ssh-keyscan github.com` >> /root/.ssh/known_hosts
   - mkdir -p /srv/kickstart /srv/formulas
-  - ssh-agent bash -c 'ssh-add /root/.ssh/git_key; git clone ${kickstart_url} /srv/kickstart'
+  - ssh-agent bash -c 'ssh-add /root/.ssh/git_key; git clone -b ${branch} ${kickstart_url} /srv/kickstart'
   - git clone https://github.com/saltstack-formulas/salt-formula.git /srv/formulas/salt-formula
   - ln -s /srv/kickstart/salt/roots /srv/salt
-  - ln -s /srv/kickstart/pillar /srv/pillar
-  - salt-call --local apply
-  - sleep 5
-  - \cp -f /tmp/minion /etc/salt/minion
+  - ln -s /srv/kickstart/salt/pillar /srv/pillar
+  - salt-call -c /tmp --local state.apply
   - systemctl restart salt-minion

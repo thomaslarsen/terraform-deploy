@@ -9,10 +9,9 @@ variable "rule_number" {
 module "egress_all" {
   source = "../"
 
-  acl_id = "${var.acl_id}"
+  acl_id      = "${var.acl_id}"
   rule_number = "${var.rule_number}"
-  cidr = "0.0.0.0/0"
-  egress = true
+  egress      = true
 }
 
 output "nacl_rule_id" {

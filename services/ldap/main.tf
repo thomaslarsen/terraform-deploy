@@ -7,13 +7,16 @@ variable "instance_type" {
 }
 
 variable "service" {
-  default = "blank"
+  default = "ldap"
 }
 
 variable "hostname" {
-  default = "blank"
+  default = "ldap"
 }
 
+variable "saltmaster" {
+  default = "salt"
+}
 
 variable "vpc_name" {
 }
@@ -44,17 +47,8 @@ provider "aws" {
   region = "${data.terraform_remote_state.vpc.region}"
 }
 
-data "template_file" "init" {
-  template = "${file("${path.module}/../../templates/init.cl")}"
-
-  vars = {
-    hostname = "${var.hostname}"
-    fqdn = "${var.hostname}.${var.appzone_name}.${data.terraform_remote_state.vpc.domain}"
-  }
-}
-
 module "instance" {
-  source        = "../../modules/instance"
+  source        = "../../modules/instance/thin"
 
   vpc_id        = "${data.terraform_remote_state.vpc.vpc_id}"
   key_name      = "${data.terraform_remote_state.vpc.vpc_key_name}"
@@ -68,7 +62,6 @@ module "instance" {
   service       = "${var.service}"
   hostname      = "${var.hostname}"
   appzone_name  = "${var.appzone_name}"
-  userdata      = "${data.template_file.init.rendered}"
 }
 
 output "private_ip" {

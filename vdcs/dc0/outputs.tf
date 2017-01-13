@@ -8,19 +8,15 @@ output "vpc_id" {
 }
 
 output "vpc_name" {
-  value = "${var.vpc_name}"
+  value = "${var.vdc_name}"
 }
 
 output "vpc_index" {
-  value = "${var.dc_index}"
+  value = "${var.vdc_index}"
 }
 
 output "igw_id" {
   value = "${module.vpc.igw_id}"
-}
-
-output "default_nacl_id" {
-  value = "${module.vpc.default_nacl_id}"
 }
 
 output "default_route_table_id" {
@@ -49,8 +45,20 @@ output "zone_id" {
   value = "${module.vpc.zone_id}"
 }
 
+output "public_zone_id" {
+  value = "${var.public_zone_id}"
+}
+
 output "domain" {
   value = "${module.vpc.domain}"
+}
+
+output "root_domain" {
+  value = "${var.root_domain}"
+}
+
+output "public_domain" {
+  value = "${var.public_domain_prefix}.${var.root_domain}"
 }
 
 output "name_servers" {
@@ -58,5 +66,5 @@ output "name_servers" {
 }
 
 output "vpc_key_name" {
-  value = "${var.vpc_name}-key"
+  value = "${var.vdc_name}-key"
 }

@@ -6,11 +6,18 @@ variable "name" {
 
 }
 
+variable "description" {
+  default = "Security Group managed by Terraform"
+}
+
 resource "aws_security_group" "sg" {
   vpc_id = "${var.vpc_id}"
 
+  description = "${var.description}"
+  name = "${var.name}"
+
   tags {
-    Name = "${var.name}"
+    Name = "sg-${var.name}"
   }
 
   lifecycle {

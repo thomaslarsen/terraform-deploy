@@ -19,7 +19,7 @@ variable "action" {
 }
 
 variable "cidr" {
-
+  default = "0.0.0.0/0"
 }
 
 variable "from_port" {
@@ -31,14 +31,14 @@ variable "to_port" {
 }
 
 resource "aws_network_acl_rule" "nacl_rule" {
-    network_acl_id = "${var.acl_id}"
-    rule_number = "${var.rule_number}"
-    egress = "${var.egress}"
-    protocol = "${var.protocol}"
-    rule_action = "${var.action}"
-    cidr_block = "${var.cidr}"
-    from_port = "${var.from_port}"
-    to_port = "${var.to_port}"
+    network_acl_id    = "${var.acl_id}"
+    rule_number       = "${var.rule_number}"
+    egress            = "${var.egress}"
+    protocol          = "${var.protocol}"
+    rule_action       = "${var.action}"
+    cidr_block        = "${var.cidr}"
+    from_port         = "${var.from_port}"
+    to_port           = "${var.to_port}"
 
     lifecycle {
       create_before_destroy = true
