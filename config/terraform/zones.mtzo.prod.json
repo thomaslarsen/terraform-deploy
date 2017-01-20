@@ -1,0 +1,10 @@
+{
+  "thin_ami_id": "ami-8b8c57f8",
+
+  "jump_instance_type": "t2.large",
+  "saltmaster_instance_type": "m4.xlarge",
+  "ldap_instance_type": "m4.large",
+  "consul_instance_type": "m4.large",
+
+  "saltmaster_kickstart_branch": "master",
+}
