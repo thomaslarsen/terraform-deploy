@@ -19,3 +19,7 @@ salt_minion:
     startup_states: 'highstate'
     grains:
       role: ${role}
+      zone: ${zone}
+      domain: ${domain}
+      vdc: ${vdc}
+      class: ${class}

@@ -56,11 +56,11 @@ variable "jump_ssh_port" {
   default = 22
 }
 
-variable "saltmaster_port1" {
+variable "saltmaster_publish_port" {
   default = 4505
 }
 
-variable "saltmaster_port2" {
+variable "saltmaster_ret_port" {
   default = 4506
 }
 variable "ldap_port" {
@@ -82,6 +82,7 @@ module "jump_instance" {
   instance_type = "${var.jump_instance_type}"
 
   vpc_id        = "${data.terraform_remote_state.vpc.vpc_id}"
+  vdc_name      = "${var.vdc_name}"
   key_name      = "${data.terraform_remote_state.vpc.vpc_key_name}"
   domain        = "${data.terraform_remote_state.vpc.domain}"
   zone_id       = "${data.terraform_remote_state.vpc.zone_id}"
@@ -94,6 +95,7 @@ module "jump_instance" {
   role          = "${var.jump_service}"
   hostname      = "${var.jump_hostname}"
   appzone_name  = "${var.appzone_name}"
+  class         = "${var.class}"
 
   #template      = "init.cl"
   saltmaster    = "${module.saltmaster_instance.fqdn}"
@@ -159,6 +161,10 @@ data "template_file" "saltmaster_init" {
     autosign        = "*.${data.terraform_remote_state.vpc.domain}"
     service         = "${var.saltmaster_service}"
     role            = "${var.saltmaster_service}"
+    zone            = "${var.appzone_name}"
+    domain          = "${data.terraform_remote_state.vpc.domain}"
+    vdc             = "${var.vdc_name}"
+    class           = "${var.class}"
   }
 }
 
@@ -169,6 +175,7 @@ module "saltmaster_instance" {
   instance_type = "${var.saltmaster_instance_type}"
 
   vpc_id        = "${data.terraform_remote_state.vpc.vpc_id}"
+  vdc_name      = "${var.vdc_name}"
   key_name      = "${data.terraform_remote_state.vpc.vpc_key_name}"
   domain        = "${data.terraform_remote_state.vpc.domain}"
   zone_id       = "${data.terraform_remote_state.vpc.zone_id}"
@@ -181,26 +188,27 @@ module "saltmaster_instance" {
   role          = "${var.saltmaster_service}"
   hostname      = "${var.saltmaster_hostname}"
   appzone_name  = "${var.appzone_name}"
+  class         = "${var.class}"
   userdata      = "${data.template_file.saltmaster_init.rendered}"
 }
 
 # Add ingress rules from all hosts in the VPC
-module "saltmaster_ingress_1" {
+module "saltmaster_ingress_publish_port" {
   source = "../../modules/sg/rule_sg"
 
   sg_id = "${module.saltmaster_instance.sg_id}"
   protocol = "TCP"
-  from_port = "${var.saltmaster_port1}"
-  to_port = "${var.saltmaster_port1}"
+  from_port = "${var.saltmaster_publish_port}"
+  to_port = "${var.saltmaster_publish_port}"
   source_sg_id = "${data.terraform_remote_state.vpc.vpc_sg_id}"
 }
-module "saltmaster_ingress_2" {
+module "saltmaster_ingress_ret_port" {
   source = "../../modules/sg/rule_sg"
 
   sg_id = "${module.saltmaster_instance.sg_id}"
   protocol = "TCP"
-  from_port = "${var.saltmaster_port2}"
-  to_port = "${var.saltmaster_port2}"
+  from_port = "${var.saltmaster_ret_port}"
+  to_port = "${var.saltmaster_ret_port}"
   source_sg_id = "${data.terraform_remote_state.vpc.vpc_sg_id}"
 }
 
@@ -231,6 +239,7 @@ module "ldap_instance" {
   instance_type = "${var.ldap_instance_type}"
 
   vpc_id        = "${data.terraform_remote_state.vpc.vpc_id}"
+  vdc_name      = "${var.vdc_name}"
   key_name      = "${data.terraform_remote_state.vpc.vpc_key_name}"
   domain        = "${data.terraform_remote_state.vpc.domain}"
   zone_id       = "${data.terraform_remote_state.vpc.zone_id}"
@@ -243,6 +252,7 @@ module "ldap_instance" {
   role          = "${var.ldap_service}"
   hostname      = "${var.ldap_hostname}"
   appzone_name  = "${var.appzone_name}"
+  class         = "${var.class}"
 
   saltmaster    = "${module.saltmaster_instance.fqdn}"
 }
@@ -269,6 +279,7 @@ module "consul_instance" {
   instance_type = "${var.consul_instance_type}"
 
   vpc_id        = "${data.terraform_remote_state.vpc.vpc_id}"
+  vdc_name      = "${var.vdc_name}"
   key_name      = "${data.terraform_remote_state.vpc.vpc_key_name}"
   domain        = "${data.terraform_remote_state.vpc.domain}"
   zone_id       = "${data.terraform_remote_state.vpc.zone_id}"
@@ -281,6 +292,7 @@ module "consul_instance" {
   role          = "${var.consul_service}"
   hostname      = "${var.consul_hostname}"
   appzone_name  = "${var.appzone_name}"
+  class         = "${var.class}"
 
   saltmaster    = "${module.saltmaster_instance.fqdn}"
 }

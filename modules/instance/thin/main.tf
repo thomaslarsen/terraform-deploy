@@ -20,7 +20,13 @@ variable "saltmaster" {
 variable "vpc_id" {
 }
 
+variable "vdc_name" {
+}
+
 variable "appzone_name" {
+}
+
+variable "class" {
 }
 
 variable "subnet_list" {
@@ -57,6 +63,10 @@ data "template_file" "init" {
     saltmaster    = "${var.saltmaster}"
     service       = "${var.service}"
     role          = "${var.role}"
+    zone          = "${var.appzone_name}"
+    domain        = "${var.domain}"
+    vdc           = "${var.vdc_name}"
+    class         = "${var.class}"
   }
 }
 
@@ -67,6 +77,7 @@ module "instance" {
   instance_type = "${var.instance_type}"
 
   vpc_id        = "${var.vpc_id}"
+  vdc_name      = "${var.vdc_name}"
   key_name      = "${var.key_name}"
   domain        = "${var.domain}"
   zone_id       = "${var.zone_id}"

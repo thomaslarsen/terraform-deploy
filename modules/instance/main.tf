@@ -17,10 +17,16 @@ variable "hostname" {
 variable "appzone_name" {
 }
 
-variable "userdata" {
-
+variable "class" {
 }
+
+variable "userdata" {
+}
+
 variable "vpc_id" {
+}
+
+variable "vdc_name" {
 }
 
 variable "subnet_list" {
@@ -73,6 +79,10 @@ resource "aws_instance" "instance" {
     FQDN        = "${var.hostname}.${var.appzone_name}.${var.domain}"
     Service     = "${var.service}"
     role        = "${var.role}"
+    zone        = "${var.appzone_name}"
+    domain      = "${var.domain}"
+    vdc         = "${var.vdc_name}"
+    class       = "${var.class}"
   }
 
   user_data = "${var.userdata}"

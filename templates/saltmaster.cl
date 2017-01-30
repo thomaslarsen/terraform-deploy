@@ -70,6 +70,10 @@ write_files:
       master_tries: -1
       grains:
         role: ${role}
+        zone: ${zone}
+        domain: ${domain}
+        vdc: ${vdc}
+        class: ${class}
 
   - path: /etc/salt/autosign.conf
     owner: root:root
