@@ -3,7 +3,7 @@
 DIR_PHASE=$(git rev-parse --show-prefix | cut -d'/' -f1)
 DIR_OBJECT=$(git rev-parse --show-prefix | cut -d'/' -f2)
 
-CONFIG_REL_PATH=./config/terraform
+CONFIG_REL_PATH=./settings/config/terraform
 
 while [[ $# -gt 0 ]]
 do
