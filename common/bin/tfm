@@ -91,7 +91,8 @@ else
   fi
 fi
 
-COMMAND=$@
+COMMAND=$1
+shift
 
 # If we have not specified a target name using the -n parameter, use the object name
 if [ "$TARGET_NAME" == "" ]; then
@@ -109,19 +110,17 @@ if [ ! -e "$(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT" ]; then
   exit 1
 fi
 
-if [ "$COMMAND" == "plan" ] || [ "$COMMAND" == "apply" ] || [ "$COMMAND" == "refresh" ]; then
+if [ "$COMMAND" == "plan" ] || [ "$COMMAND" == "apply" ] || [ "$COMMAND" == "refresh" ] || [ "$COMMAND" == "destroy" ]; then
   TF_VAR_FILE="-var-file=$(git rev-parse --show-toplevel)/$CONFIG_REL_PATH/$TF_PHASE.$TF_NAME.json"
-  TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/state/$TF_NAME.$TF_PHASE.tfstate"
   case $TF_PHASE in
     zones)
-      TF_VAR_SETTINGS="$VAR_SETTINGS1 $VAR_SETTINGS2"
-      # If class setting file exist, add it
-      if [ -f "$(git rev-parse --show-toplevel)/$CONFIG_REL_PATH/$TF_PHASE.$TF_NAME.$TF_CLASS.json" ]; then
-        TF_VAR_FILE="$TF_VAR_FILE -var-file=$(git rev-parse --show-toplevel)/$CONFIG_REL_PATH/$TF_PHASE.$TF_NAME.$TF_CLASS.json"
-      fi
+      TF_VAR_SETTINGS="$VAR_SETTINGS1 $VAR_SETTINGS2 -var class=$TF_CLASS"
+      TF_VAR_FILE="$TF_VAR_FILE -var-file=$(git rev-parse --show-toplevel)/$CONFIG_REL_PATH/$TF_PHASE.$TF_NAME.$TF_CLASS.json"
+      TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/state/$TF_NAME.$TF_PHASE.$TF_CLASS.tfstate"
       ;;
     vdcs)
-      TF_VAR_SETTINGS="$VAR_SETTINGS0 $VAR_SETTINGS3 -var class=$TF_CLASS"
+      TF_VAR_SETTINGS="$VAR_SETTINGS0 $VAR_SETTINGS3"
+      TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/state/$TF_NAME.$TF_PHASE.tfstate"
       ;;
   esac
 fi
@@ -142,7 +141,8 @@ echo VAR Settings:  $TF_VAR_SETTINGS
 echo STATE File:    $TF_STATE_FILE
 echo DIR:           $(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT
 
-echo Command:       $@
+echo Command:       $COMMAND
+echo Command prms:  $@
 
 echo
- terraform $@ $TF_STATE_FILE $TF_VAR_FILE $TF_VAR_SETTINGS $(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT
+ terraform $COMMAND  $@ $TF_STATE_FILE $TF_VAR_FILE $TF_VAR_SETTINGS $(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT

@@ -1,6 +1,5 @@
 
 variable "vdc_name" {
-  default = "dc0"
 }
 
 variable "appzone_name" {
@@ -8,7 +7,6 @@ variable "appzone_name" {
 }
 
 variable "appzone_index" {
-  default = 0
 }
 
 variable "appzone_3rd" {
@@ -17,5 +15,6 @@ variable "appzone_3rd" {
 }
 
 variable "class" {
-  default = "dev"
 }
+
+variable "region"       { default = "eu-west-1" }

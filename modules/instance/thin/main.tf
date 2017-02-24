@@ -90,6 +90,7 @@ module "instance" {
   role          = "${var.role}"
   hostname      = "${var.hostname}"
   appzone_name  = "${var.appzone_name}"
+  class         = "${var.class}"
   userdata      = "${data.template_file.init.rendered}"
 }
 
