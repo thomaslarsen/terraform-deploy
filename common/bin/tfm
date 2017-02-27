@@ -126,7 +126,7 @@ if [ "$COMMAND" == "plan" ] || [ "$COMMAND" == "apply" ] || [ "$COMMAND" == "ref
 fi
 
 export TF_VAR_region="eu-west-1"
-$TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/$TF_STATE_KEY"
+TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/$TF_STATE_KEY"
 
 terraform remote config \
     -backend=s3 \
