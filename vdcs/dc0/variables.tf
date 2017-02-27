@@ -1,19 +1,14 @@
 
-variable "region"       { default = "eu-west-1" }
+variable "region"       { }
 
-variable "vdc_name"     {
+variable "vdc_name"     { }
 
-}
+variable "vdc_index"    { }
+
+variable "root_domain"  { }
 
 variable "vdc_subnet_size" {
   default = "18"
-}
-
-variable "vdc_index" {
-}
-
-variable "root_domain" {
-
 }
 
 variable "public_domain_prefix" {
