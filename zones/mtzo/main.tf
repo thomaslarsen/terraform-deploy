@@ -1,8 +1,10 @@
 
 data "terraform_remote_state" "vpc" {
-    backend = "local"
+    backend = "s3"
     config {
-        path = "${path.module}/../../state/${var.vdc_name}.vdcs.tfstate"
+        bucket = "global.terraform"
+        key = "state/vdcs/${var.vdc_name}.tfstate"
+        region = "${var.region}"
     }
 }
 

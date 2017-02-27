@@ -116,14 +116,23 @@ if [ "$COMMAND" == "plan" ] || [ "$COMMAND" == "apply" ] || [ "$COMMAND" == "ref
     zones)
       TF_VAR_SETTINGS="$VAR_SETTINGS1 $VAR_SETTINGS2 -var class=$TF_CLASS"
       TF_VAR_FILE="$TF_VAR_FILE -var-file=$(git rev-parse --show-toplevel)/$CONFIG_REL_PATH/$TF_PHASE.$TF_NAME.$TF_CLASS.json"
-      TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/state/$TF_NAME.$TF_PHASE.$TF_CLASS.tfstate"
+      TF_STATE_KEY="state/$TF_PHASE/$TF_NAME-$TF_CLASS.tfstate"
       ;;
     vdcs)
       TF_VAR_SETTINGS="$VAR_SETTINGS0 $VAR_SETTINGS3"
-      TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/state/$TF_NAME.$TF_PHASE.tfstate"
+      TF_STATE_KEY="state/$TF_PHASE/$TF_NAME.tfstate"
       ;;
   esac
 fi
+
+export TF_VAR_region="eu-west-1"
+$TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/$TF_STATE_KEY"
+
+terraform remote config \
+    -backend=s3 \
+    -backend-config="bucket=global.terraform" \
+    -backend-config="key=$TF_STATE_KEY" \
+    -backend-config="region=$TF_VAR_region"
 
 echo VDC index:     $VDC_INDEX
 echo VPC name:      $VPC_NAME
@@ -138,11 +147,11 @@ echo
 
 echo VAR File:      $TF_VAR_FILE
 echo VAR Settings:  $TF_VAR_SETTINGS
-echo STATE File:    $TF_STATE_FILE
+echo STATE Key:     $TF_STATE_KEY
 echo DIR:           $(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT
 
 echo Command:       $COMMAND
 echo Command prms:  $@
 
 echo
- terraform $COMMAND  $@ $TF_STATE_FILE $TF_VAR_FILE $TF_VAR_SETTINGS $(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT
+ terraform $COMMAND $@ $TF_VAR_FILE $TF_VAR_SETTINGS $(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT
