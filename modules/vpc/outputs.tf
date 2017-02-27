@@ -31,3 +31,7 @@ output "domain" {
 output "name_servers" {
   value = "${module.vpc_dns_zone.name_servers}"
 }
+
+output "secrets_bucket_id" {
+  value = "${aws_s3_bucket.secrets.id}"
+}

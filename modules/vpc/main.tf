@@ -52,3 +52,8 @@ module "vpc_dns_zone" {
   vpc_id = "${aws_vpc.vpc.id}"
   domain = "${var.name}.${var.root_domain}"
 }
+
+resource "aws_s3_bucket" "secrets" {
+    bucket = "${var.name}.secrets"
+    acl = "private"
+}

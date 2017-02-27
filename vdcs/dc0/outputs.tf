@@ -68,3 +68,7 @@ output "name_servers" {
 output "vpc_key_name" {
   value = "${var.vdc_name}-key"
 }
+
+output "secrets_bucket_id" {
+  value = "${module.vpc.secrets_bucket_id}"
+}
