@@ -156,7 +156,6 @@ data "template_file" "saltmaster_init" {
     hostname        = "${var.saltmaster_hostname}"
     fqdn            = "${var.saltmaster_hostname}.${var.appzone_name}.${data.terraform_remote_state.vpc.domain}"
     kickstart_url   = "${var.saltmaster_kickstart_url}"
-    git_key         = "${file("${path.module}/../../secrets/${var.vdc_name}_rsa")}"
     branch          = "${var.saltmaster_kickstart_branch}"
     autosign        = "*.${data.terraform_remote_state.vpc.domain}"
     service         = "${var.saltmaster_service}"
