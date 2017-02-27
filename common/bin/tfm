@@ -103,6 +103,8 @@ fi
 
 TF_CLASS=${CLASS:-dev}
 
+export TF_VAR_region="eu-west-1"
+
 export AWS_SHARED_CREDENTIALS_FILE=$(git rev-parse --show-toplevel)/.aws/credentials
 
 if [ ! -e "$(git rev-parse --show-toplevel)/$TF_PHASE/$TF_OBJECT" ]; then
@@ -117,22 +119,23 @@ if [ "$COMMAND" == "plan" ] || [ "$COMMAND" == "apply" ] || [ "$COMMAND" == "ref
       TF_VAR_SETTINGS="$VAR_SETTINGS1 $VAR_SETTINGS2 -var class=$TF_CLASS"
       TF_VAR_FILE="$TF_VAR_FILE -var-file=$(git rev-parse --show-toplevel)/$CONFIG_REL_PATH/$TF_PHASE.$TF_NAME.$TF_CLASS.json"
       TF_STATE_KEY="state/$TF_PHASE/$TF_NAME-$TF_CLASS.tfstate"
+      terraform remote config \
+          -backend=s3 \
+          -backend-config="bucket=global.terraform" \
+          -backend-config="key=$TF_STATE_KEY" \
+          -backend-config="region=$TF_VAR_region"
       ;;
     vdcs)
       TF_VAR_SETTINGS="$VAR_SETTINGS0 $VAR_SETTINGS3"
       TF_STATE_KEY="state/$TF_PHASE/$TF_NAME.tfstate"
+      terraform remote config \
+          -backend=s3 \
+          -backend-config="bucket=global.terraform" \
+          -backend-config="key=$TF_STATE_KEY" \
+          -backend-config="region=$TF_VAR_region"
       ;;
   esac
 fi
-
-export TF_VAR_region="eu-west-1"
-TF_STATE_FILE="-state=$(git rev-parse --show-toplevel)/$TF_STATE_KEY"
-
-terraform remote config \
-    -backend=s3 \
-    -backend-config="bucket=global.terraform" \
-    -backend-config="key=$TF_STATE_KEY" \
-    -backend-config="region=$TF_VAR_region"
 
 echo VDC index:     $VDC_INDEX
 echo VPC name:      $VPC_NAME
