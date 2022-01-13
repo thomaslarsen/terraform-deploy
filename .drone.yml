@@ -1,0 +1,16 @@
+pipeline:
+  build:
+    image: hashicorp/terraform:light
+    environment:
+      - AWS_SHARED_CREDENTIALS_FILE=/drone/src/.aws/credentials
+    commands:
+      - cd ${TF_BUILD}
+      - source /drone/src/common/bin/tfm_drone ${TF_CMD}
+matrix:
+  TF_BUILD:
+    - vdcs/dc0
+    - zones/core
+    - zones/mtzo
+  TF_CMD:
+    - validate
+    - plan

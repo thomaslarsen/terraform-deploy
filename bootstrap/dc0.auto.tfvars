@@ -1,0 +1,1 @@
+../settings/config/terraform/vdcs.dc0.json

@@ -14,15 +14,17 @@ yum_repos:
 packages:
   - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   - git
-  - salt-master
-  - salt-minion
-  # - GitPython
+  - unzip
 
-write_files:
-  - path: /etc/salt/master
-    owner: root:root
-    content: |
-      autosign_file: /etc/salt/autosign.conf
+salt_minion:
+    conf:
+      id: ${fqdn}
+      grains:
+        role: ${role}
+        zone: ${zone}
+        vdc: ${vdc}
+        class: ${class}
+
       fileserver_backend:
         - git
       gitfs_remotes:
@@ -30,6 +32,7 @@ write_files:
           - root: roots
         - https://github.com/thomaslarsen/salt-formula.git
         - https://github.com/saltstack-formulas/epel-formula
+        - https://github.com/mitodl/vault-formula.git
       gitfs_ssl_verify: False
       ext_pillar:
         - git:
@@ -37,27 +40,3 @@ write_files:
             - root: config
           - https://github.com/thomaslarsen/system-config.git:
             - root: pillar
-
-  - path: /etc/salt/minion
-    owner: root:root
-    content: |
-      id: ${fqdn}
-      master: ${fqdn}
-      startup_states: 'highstate'
-      master_tries: -1
-      grains:
-        role: ${role}
-        zone: ${zone}
-        vdc: ${vdc}
-        class: ${class}
-
-  - path: /etc/salt/autosign.conf
-    owner: root:root
-    content: |
-      ${autosign}
-
-runcmd:
-  - yum -y install GitPython
-  - systemctl start salt-master
-  - sleep 5
-  - systemctl start salt-minion
